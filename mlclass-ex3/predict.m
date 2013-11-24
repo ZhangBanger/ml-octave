@@ -28,7 +28,7 @@ a3 = sigmoid(a2 * Theta2');
 
 [probs, labels] = max(a3, [], 2);
 
-p = labels
+p = labels;
 
 
 
