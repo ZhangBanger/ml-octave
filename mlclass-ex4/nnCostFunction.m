@@ -62,28 +62,15 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-% Calcuate h(X)
-X = [ones(m, 1) X];
-a2 = sigmoid(X * Theta1');
-a2 = [ones(size(a2, 1), 1) a2];
-hX = sigmoid(a2 * Theta2');
-
-% Inflate y into Y matrix
-Y = eye(num_labels)(y, :);
-for i = 1:m
-	J += 1 / m * sum(-Y(i, :) .* log(hX(i, :)) - (1 - Y(i, :)) .* log(1 - hX(i, :)));
-end
-
-% Copy into zeroed bias Thetas
+% Compute zeroed bias Thetas
 Theta1NoBias = [zeros(size(Theta1, 1), 1) Theta1(:, 2:end)];
 Theta2NoBias = [zeros(size(Theta2, 1), 1) Theta2(:, 2:end)];
-% Roll up theta params squared
-J += lambda / (2 * m) * (sum(sum(Theta1NoBias .^ 2)) + sum(sum(Theta2NoBias .^ 2)));
 
 for t = 1:m
-	% Forward Propagate
+	% Forward Prop
 	a_1 = X(t, :);
-	
+	a_1 = [1 a_1];
+
 	z_2 = Theta1 * a_1';
 	a_2 = sigmoid(z_2);
 	a_2 = [1 ; a_2];
@@ -91,17 +78,24 @@ for t = 1:m
 	z_3 = Theta2 * a_2;
 	a_3 = sigmoid(z_3);
 
-	% Back Prop
+	% Inflate y into vec
 	y_vec = eye(num_labels)(y(t), :);
+
+	% Accumulate cost
+	J += 1 / m * sum(-y_vec .* log(a_3') - (1 - y_vec) .* log(1 - a_3'));
+
+	% Back Prop
 	delta_3 = a_3 - y_vec';
+	Theta2_grad = Theta2_grad + delta_3 * a_2';
 
 	delta_2 = Theta2(:, 2:end)' * delta_3 .* sigmoidGradient(z_2);
-
-	Theta2_grad = Theta2_grad + delta_3 * a_2';
 	Theta1_grad = Theta1_grad + delta_2 * a_1;
-
 end
 
+% Regularize cost
+J += lambda / (2 * m) * (sum(sum(Theta1NoBias .^ 2)) + sum(sum(Theta2NoBias .^ 2)));
+
+% Regularize gradients
 Theta2_grad = Theta2_grad / m + (lambda / m) * Theta2NoBias;
 Theta1_grad = Theta1_grad / m + (lambda / m) * Theta1NoBias;
 
