@@ -74,10 +74,11 @@ for i = 1:m
 	J += 1 / m * sum(-Y(i, :) .* log(hX(i, :)) - (1 - Y(i, :)) .* log(1 - hX(i, :)));
 end
 
-
-
-
-
+% Copy into zeroed bias Thetas
+Theta1NoBias = [zeros(size(Theta1, 1), 1) Theta1(:, 2:end)];
+Theta2NoBias = [zeros(size(Theta2, 1), 1) Theta2(:, 2:end)];
+% Roll up theta params squared
+J += lambda / (2 * m) * (sum(sum(Theta1NoBias .^ 2)) + sum(sum(Theta2NoBias .^ 2)));
 
 
 % -------------------------------------------------------------
