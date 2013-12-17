@@ -80,6 +80,30 @@ Theta2NoBias = [zeros(size(Theta2, 1), 1) Theta2(:, 2:end)];
 % Roll up theta params squared
 J += lambda / (2 * m) * (sum(sum(Theta1NoBias .^ 2)) + sum(sum(Theta2NoBias .^ 2)));
 
+for t = 1:m
+	% Forward Propagate
+	a_1 = X(t, :);
+	
+	z_2 = Theta1 * a_1';
+	a_2 = sigmoid(z_2);
+	a_2 = [1 ; a_2];
+
+	z_3 = Theta2 * a_2;
+	a_3 = sigmoid(z_3);
+
+	% Back Prop
+	y_vec = eye(num_labels)(y(t), :);
+	delta_3 = a_3 - y_vec';
+
+	delta_2 = Theta2(:, 2:end)' * delta_3 .* sigmoidGradient(z_2);
+
+	Theta2_grad = Theta2_grad + delta_3 * a_2';
+	Theta1_grad = Theta1_grad + delta_2 * a_1;
+
+end
+
+Theta2_grad = Theta2_grad / m + (lambda / m) * Theta2NoBias;
+Theta1_grad = Theta1_grad / m + (lambda / m) * Theta1NoBias;
 
 % -------------------------------------------------------------
 
