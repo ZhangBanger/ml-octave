@@ -45,9 +45,9 @@ Theta_grad = zeros(size(Theta));
 error_filtered = (X * Theta' - Y) .* R;
 
 
-J = 1 / 2 * sum(sum(error_filtered.^2));
-X_grad = error_filtered * Theta;
-Theta_grad = error_filtered' * X;
+J = 1 / 2 * sum(sum(error_filtered.^2)) + lambda / 2 * sum(sum(Theta .^ 2)) + lambda / 2 * sum(sum(X .^ 2));
+X_grad = error_filtered * Theta + lambda * X;
+Theta_grad = error_filtered' * X + lambda * Theta;
 
 
 
